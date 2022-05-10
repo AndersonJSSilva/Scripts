@@ -1,8 +1,8 @@
 ﻿#############CRIAR USUÁRIO#################
 
 $servers = Get-Content -Path C:\temp\servers.txt
-$users = 'unimedrj\testelocal'
-$password = 'Unimed#01'
+$users = 'admlocaldsv'
+$password = 'L4cDsv#@!'
 $desc = 'Automatically created local admin account'
 $saida = $null
 

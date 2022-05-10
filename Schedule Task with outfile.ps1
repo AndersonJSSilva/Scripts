@@ -37,7 +37,9 @@ try {
        return
 }
 
-$hostnames = Get-Content c:\temp\servers.txt
+
+$saidatask = ""
+$hostnames = Get-Content C:\SERVERS\servidores_HMG.txt
 foreach($ComputerName in $hostnames ){
 
 try{$Schedule.connect($ComputerName)} catch {}
@@ -50,11 +52,13 @@ foreach ($Folder in $AllFolders) {
                      
             if(([xml]$_.xml).Task.Principals.Principal.UserID -like "*adm*")
             {
-                $ComputerName
-                write-host "`t" $_.path "`t`t" ([xml]$_.xml).Task.Principals.Principal.UserID
+                
+                $saidatask +="`n"+$ComputerName + "`t" +$_.path+ "`t`t"+ ([xml]$_.xml).Task.Principals.Principal.UserID
             }
+            
         }
     }
 } 
 
 } 
+Set-Content -Path C:\SERVERS\resultTASK_HMG.txt -Value $saidatask

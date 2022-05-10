@@ -1,29 +1,9 @@
-﻿$psexec = C:\PsTools\PsExec.exe \\unicoop30427 powercfg /x /monitor-timeout-ac 0
+﻿#################################### Energia Windows 7###############################################################################
 
-
-$computers = @("unicoop304255557","unicoop55555555","unicoop30427","unicoop30410")   
-$saida = $null
-
-foreach ($computer in $computers) {
-    if (test-Connection -count 1 -Cn $computer -quiet) {
-     C:\pstools\psexec.exe -d \\$computer powercfg /x /monitor-timeout-ac 0
-     $saida += "`n" + $computer + "`t" + "is online"
-    }
-     else {
-        #"$computer is not online"
-        $saida += "`n" + $computer + "`t" + "is not online"
-           } 
-}
-
-$session = New-PSSession -Credential unimedrj\adm50610
-
-Get-WmiObject -ComputerName Unibar02025032 -Class Win32_OperatingSystem | select *
-
-$computer = "pcjean-pc"
-
-$computers = @("pcjean-pc","Unibar02025032")  
-$computerOnline = @()
-$computerOffline = @() 
+$computers = Get-Content -Path C:\PsTools\Desktops\Desktops.txt  
+$computerOnline7 = @()
+$computerOnlineXP = @()
+$computerOffline = @()      
 
 foreach ($computer in $computers) 
 {
@@ -32,23 +12,15 @@ foreach ($computer in $computers)
         $OS = Get-WmiObject -Computer $computer -Class Win32_OperatingSystem
         if($OS.caption -like '*Windows 7*')
         {
-            Invoke-Command -ComputerName $computer -ScriptBlock {powercfg -energy -xml} -AsJob     
-            $computerOnline += $computer
+
+            $computerOnline7 += $computer
+
         }
         $OS = Get-WmiObject -Computer $computer -Class Win32_OperatingSystem
         if($OS.caption -like '*Windows xp*')
         {
             
-            #$cmdline = "/query >> c:\$computer.txt"
-            #Invoke-Command -ComputerName $computer -ScriptBlock {}
-            #start-process -Wait -PSPath "c:\pstools\PsExec.Exe" -ArgumentList $cmdline -RedirectStandardError c:\temp\$computer-error.log -RedirectStandardOutput c:\temp\$computer-output.log
-            $computerOnline += $computer
-
-            $command = "powercfg -query @> C:\teste.txt"
-            $process = [WMICLASS]"\\$Computer\ROOT\CIMV2:win32_process"
-            $result = $process.Create($command) 
-
-
+            $computerOnlineXP += $computer
         }
     }
      else {       
@@ -56,24 +28,23 @@ foreach ($computer in $computers)
     } 
 }
 
+ 
+#####################################################################################################################################
 
+Antes rodar o PSEXEC: C:\PsTools>PsExec.exe -d @server7.txt -u unimedrj\adm50610 -p SENH@FORT3 powercfg -energy -xml >> c:\temp\w7.txt
 
-Get-Job
+#####################################################################################################################################
 
-
-
-foreach ($computer in $computerOnline) 
+foreach ($computer in $computerOnline7) 
 {
-        $OS = Get-WmiObject -Computer $computer -Class Win32_OperatingSystem 
-        if($OS.caption -like '*Windows 7*'){
-          Copy-Item "\\$computer\c$\users\adm50610\documents\energy-report.xml" -Destination \\10.200.5.94\powercfg\$computer.xml
-        }
-        if($OS.caption -like '*Windows XP*'){
-          Copy-Item "\\$computer\c$\documents and settings\adm50610\Meus documentos\energy-report.xml" -Destination \\10.200.5.94\powercfg\$computer.xml
-        }
-}
+          copy-Item "\\$computer\c$\windows\system32\energy-report.xml" -Destination \\10.200.5.94\powercfg\$computer.xml
+ 
+ }
 
-foreach ($computer in $computerOnline) 
+$countNunca = 0
+$countDesliga = 0 
+$saidafinal = @()
+foreach ($computer in $computerOnline7) 
 {
 
     [xml]$xmlfile = Get-Content "C:\powercfg\$computer.xml" -ErrorAction SilentlyContinue
@@ -89,14 +60,70 @@ foreach ($computer in $computerOnline)
     }
     if($achou)
     {
-        Write-host "NUNCA" $computer -ForegroundColor red
+        $saidafinal += "NUNCA;"+ $computer
+        $countNunca ++
     } else {
-        Write-Host "DESLIGAR" $computer -ForegroundColor yellow
+        $saidafinal +=  "DESLIGAR;" +$computer
+        $countDesliga ++
     }
 }
 
+$saidafinal += "`nQtd de PC que nunca desligam o monitor: "+ $countNunca
+$saidafinal += "Qtd de PC que desligam o monitor: "+$countDesliga
 
-Get-Job -Id 14 | select *
+$saidafinal | Out-File C:\temp\windows7.txt
 
+#################################### Energia Windows XP##############################################################################
 
-Test-Connection -Count 1 -ComputerName unicoop30427
+C:\PsTools>PsExec.exe @serverxp.txt -u unimedrj\adm50610 -p SENH@FORT3 powercfg /query >> c:\temp\wxp.txt
+
+#####################################################################################################################################
+
+# Parse output xp file
+
+#####################################################################################################################################
+
+$txtfile = Get-Content "c:\temp\wxp.txt" -ErrorAction SilentlyContinue
+$countNuncaxp = 0
+$countDesligaxp = 0 
+$values = @()
+$saidafinalxp = @()
+foreach($line in $txtfile) 
+{
+    $strtmp = $line -replace " ",""
+    if($strtmp -like "Desligarmonitor(AC)Nunca*")
+    {
+        $countNuncaxp ++
+        $values += $line
+    }
+        if($strtmp -like "Desligarmonitor(AC)Depoisde*")
+    {
+        $countDesligaxp ++
+        $values += $line
+    }
+}
+
+#$countNuncaxp
+#$countDesligaxp
+
+$computersTXT = @()
+foreach($line in $txtfile) 
+{
+    
+    if($line -like "\\*")
+    {
+        $var1 = $line -replace "\\",""
+        $var1 = $var1 -replace ":",""
+        $computersTXT += $var1
+    }
+}
+
+for($i=0;$i -lt $computersTXT.Count; $i++)
+{
+    $saidafinalxp += $computersTXT[$i] +" : " + $values[$i]
+
+}
+$saidafinalxp += "`nQtd de PC que nunca desligam o monitor: "+ $countNuncaxp
+$saidafinalxp += "Qtd de PC que desligam o monitor: "+$countDesligaxp
+
+$saidafinalxp | Out-File c:\temp\windowsxp.txt

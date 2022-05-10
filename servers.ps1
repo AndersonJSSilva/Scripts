@@ -1,9 +1,10 @@
 ﻿###################Verificar espaço Usado no DISCO###########
 
-$servers = @("unicoop30427","excprd04","excboxprd02")
+$servers = @("SCSMPRD01","SCSMWCPRD01","SCSMDBPRD01","SCSMDWDBPRD01","SCSMDWPRD01","SCSMSPPRD01","SCORCHPRD01")
 $saida = ""
-Get-WmiObject -ComputerName $servers win32_logicaldisk -Filter "drivetype = 3" | % { $saida += "`n"+ $_.systemname + "`t" + $_.name + "`t" +("{0:N2}" -f (($_.size - $_.freespace)/1GB) + "GB") +"`n"  } | Out-File -FilePath C:\temp\serverperf.txt
+Get-WmiObject -ComputerName $servers win32_logicaldisk -Filter "drivetype = 3" | % { $saida += "`n"+ $_.systemname + "`t" + $_.name + "`t" +("{0:N2}" -f (($_.size - $_.freespace)/1GB) + "GB") +"`n"  } | Out-File -FilePath C:\temp\serverperfscsm.txt
 
+Set-Content -Path C:\temp\SCSM.txt -Value $saida
 
 $saida | Out-File -FilePath C:\temp\serverperf.txt
 

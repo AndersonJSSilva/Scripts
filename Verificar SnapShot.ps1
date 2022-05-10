@@ -1,4 +1,6 @@
-﻿# Conectar no VCenter
+﻿Add-PSSnapin -name *vmware*
+
+# Conectar no VCenter
 Connect-VIServer vmvcenter
 
 # Listar VMs com snapshot
@@ -8,7 +10,7 @@ get-vm | get-snapshot | format-list vm,name,Created,sizemb
 get-vm | ?{$_.powerstatus -ne "poweredon"} | sort powerstatus
 
 # remover snapshot
-$snapshot = get-vm -name Win2012lab02 | Get-Snapshot
+$snapshot = get-vm -name mtfprd03 | Get-Snapshot
 echo $snapshot
 Remove-Snapshot -Snapshot $snapshot -RunAsync
 

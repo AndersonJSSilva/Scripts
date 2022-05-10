@@ -37,3 +37,5 @@ $users.Length
 $usuarios | %{Get-User -identity $_ | fl samaccountname, mobilephone}
 
 Add-PSSnapin -Name *Exchange*
+
+Add-PSSnapin -Name *VMWARE*

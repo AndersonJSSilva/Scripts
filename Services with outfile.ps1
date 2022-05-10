@@ -1,4 +1,4 @@
-﻿$hostnames = Get-Content c:\temp\servers.txt
+﻿$hostnames = Get-Content C:\SERVERS\servidores_HMG.txt
 
 $saida=""
 foreach($server in $hostnames)
@@ -9,13 +9,22 @@ foreach($server in $hostnames)
     {
         if($service)
         { 
-           #Write-Host $server
+           Write-Host $server
            $saida +="`n"+ $server +"`n"
-            $saida +="`t"+$service.displayname +" - "  + $service.startname
+            $saida +="`t"+$service.displayname +" - "  + $service.startname + "`n"
         }
     }
     }catch{}
     
         
 }
-Set-Content -Path c:\temp\saida.txt -Value $saida
+#$saida
+if(!$saida)
+{
+    write-host "nada encontrado" 
+    
+} else
+{
+    Set-Content -Path C:\SERVERS\Result_services_HMG.txt -Value $saida
+    
+}
