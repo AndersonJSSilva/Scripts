@@ -1,4 +1,8 @@
-﻿$servidor = "opmehmg01"
+﻿$servidor = Read-Host "Digite o servidor"
+if (!$servidor)
+{    Write-Host "Nada digitado"
+    break
+}
 
 $path = "\\OPMEHMG01\c$\Inetpub\wwwroot\unimed\opme20\"
 $folderbk1 = "src"
@@ -14,7 +18,7 @@ Copy-Item -Path $pathori1 -Destination $pathdest1 -Recurse
 Copy-Item -Path $pathori2 -Destination $pathdest2 -Recurse
 
 $servico = "IISadmin"
-$Servico2 = "World Wide Web"
+#$Servico2 = "World Wide Web"
 
 $pastaversao = "C:\OPMEHMG"
 $versoes = Get-ChildItem $pastaversao | Sort-Object basename
@@ -31,7 +35,7 @@ write-host "######################################" -ForegroundColor black -Back
 $int = read-host "digite o numero do zip"
 $ZipFile = $versoes[$int-1].FullName
 $pasta = $versoes[$int-1].BaseName
-Get-ChildItem $ZipFile | % {& "C:\Program Files\7-Zip\7z.exe" "x" $_.fullname "-oC:\temp\deploy\$pasta"}
+Get-ChildItem $ZipFile | % {& "C:\Program Files (x86)\7-Zip\7z.exe" "x" $_.fullname "-oC:\temp\deploy\$pasta"}
 
 $files = @()
 if (test-path "c:\temp\deploy\$pasta\*.sql")
@@ -40,7 +44,8 @@ if (test-path "c:\temp\deploy\$pasta\*.sql")
     $filestoatt = Get-Item "c:\temp\deploy\$pasta\*.sql"
     $corpo = "`nPrezados,`n`nFavor aplicar em OPME HMG.`nScripts em Anexo.`n`nAtt,"
     Send-MailMessage -to "Infra DBA <_infra-ti_dba@unimedrio.com.br>" -from "Infra Windows <_infra-ti_servidores_windows@unimedrio.com.br>" -subject "Aplicar em OPME HMG" -SmtpServer "mail.unimedrio.com.br" -Body $corpo -Attachments $filestoatt
-}
+} 
+
 
 pause
 
@@ -66,7 +71,10 @@ write-host "copiando para... $servidor -> C:\Inetpub\wwwroot\unimed\opme20\" -Fo
 
 Get-ChildItem "c:\temp\deploy\$pasta\" | where-object {$_.PSiscontainer} | Copy-Item -Destination $path -Recurse -Force
 
+#Get-ChildItem "c:\temp\deploy\$pasta\" -Exclude "*.pdf" | Copy-Item -Destination "c:\testebk\" -Recurse -Force
 
+$pathdelete = "\\opmehmg01\c$\Inetpub\wwwroot\unimed\opme20\cache\smarty-template-c\"
+Get-ChildItem -path $pathdelete -Recurse |  Remove-Item -Recurse -Force
 
 #Inicia os serviços
 (Get-Service -ComputerName $servidor -Name 'IISAdmin').start()
@@ -75,11 +83,9 @@ Start-Sleep 10
 (Get-Service -ComputerName $servidor -Name 'w3svc').start()
 write-host "Iniciando: " $servico2 " em " $servidor -ForegroundColor black -BackgroundColor yellow
 
-
 Get-ChildItem -path "c:\temp\deploy\" -Recurse | where-object {$_.PSiscontainer} | Remove-Item -Recurse -Force
 
-$pathdelete = "\\opmehmg01\c$\Inetpub\wwwroot\unimed\opme20\cache\smarty-template-c\"
-Get-ChildItem -path $pathdelete -Recurse |  Remove-Item -Recurse -Force 
-
 write-host "Finalizado!!!!!" -ForegroundColor white -BackgroundColor green
+
+
 

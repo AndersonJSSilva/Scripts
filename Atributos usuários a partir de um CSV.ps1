@@ -1,0 +1,1 @@
+﻿Import-Csv -Path C:\Admin\user2.csv | % { Get-ADUser -Identity $_.user -Properties *} | select Name,SamAccountName,EmailAddress,telephonenumber|Export-Csv C:\Admin\lista.csv -Encoding Unicode

@@ -1,4 +1,13 @@
-﻿function Get-LoggedOnUser { 
+﻿Get-ADComputer -LDAPFilter "(name=*)" -SearchBase "OU=_Benfica,OU=Wsus - Windows Update,OU=Computadores,DC=unimedrj,DC=root"
+
+
+$computers = Get-ADComputer -SearchBase "OU=_Benfica,OU=Wsus - Windows Update,OU=Computadores,DC=unimedrj,DC=root" -Filter '*' | Select -Exp Name
+$computers.Count
+
+
+
+
+function Get-LoggedOnUser { 
 #Requires -Version 2.0             
 [CmdletBinding()]             
  Param              
@@ -65,4 +74,9 @@ foreach($out in $saida)
   $saidauser += $outinfo
 
 }
-$saidauser
+$saidauser | Export-Csv -Path C:\temp\c42h.csv
+
+
+Search-Mailbox -identity teste_ti -searchquery {(Received:> 01/01/2016 and Received:< 01/03/2016)} -DeleteContent
+
+Search-Mailbox -identity m50610 -searchquery "Received:(03/08/2016..03/09/2016)" -DeleteContent

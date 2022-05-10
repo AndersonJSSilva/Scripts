@@ -1,11 +1,11 @@
 ﻿#################################### Energia Windows 7###############################################################################
 
-$computers = @("UNICOOP30409","pcjean-pc","UNICOOP30382")  
+$computers = Get-Content -Path C:\PsTools\Desktops\Desktops.txt
 $computerOnline7 = @()
 $computerOnlineXP = @()
-$computerOffline = @()      
+$computerOffline = @()
 
-foreach ($computer in $computers) 
+foreach ($computer in $computers)
 {
     if (test-Connection -count 1 -Cn $computer -quiet)
     {
@@ -23,20 +23,21 @@ foreach ($computer in $computers)
             $computerOnlineXP += $computer
         }
     }
-     else {       
+     else {
      $computerOffline += $computer
-    } 
+    }
 }
 
+ 
 #####################################################################################################################################
 
-Antes rodar o PSEXEC: C:\PsTools>PsExec.exe -d @server7.txt -u unimedrj\adm50610 -p SENH@FORT3 powercfg -energy -xml >> c:\temp\w7.txt
+Antes rodar o PSEXEC: C:\PsTools>PsExec.exe -d @Desktop7.txt -u unimedrj\adm50610 -p SENH@FORT3 powercfg -energy -xml >> c:\temp\w7.txt
 
 #####################################################################################################################################
 
 foreach ($computer in $computerOnline7) 
 {
-          Copy-Item "\\$computer\c$\windows\system32\energy-report.xml" -Destination \\10.200.5.94\powercfg\$computer.xml
+          copy-Item "\\$computer\c$\windows\system32\energy-report.xml" -Destination \\10.200.5.94\powercfg\$computer.xml
  
  }
 
@@ -70,40 +71,44 @@ foreach ($computer in $computerOnline7)
 $saidafinal += "`nQtd de PC que nunca desligam o monitor: "+ $countNunca
 $saidafinal += "Qtd de PC que desligam o monitor: "+$countDesliga
 
-$saidafinal
+$saidafinal | Out-File C:\temp\windows7.txt
 
 #################################### Energia Windows XP##############################################################################
 
-C:\PsTools>PsExec.exe @serverXP.txt -u unimedrj\adm50610 -p SENH@FORT3 powercfg /query >> c:\temp\wxp.txt
+C:\PsTools>PsExec.exe @DesktopXP.txt -u unimedrj\adm50610 -p SENH@FORT3 powercfg /query >> c:\temp\DesktopXP.txt
 
+Restart-Computer -ComputerName unicoop30427 -Force 
+
+Restart-Computer -ComputerName unicoop30410 -Force 
 #####################################################################################################################################
 
 # Parse output xp file
 
 #####################################################################################################################################
 
-$txtfile = Get-Content "c:\temp\wxp.txt" -ErrorAction SilentlyContinue
-$countNunca = 0
-$countDesliga = 0 
+$txtfile = Get-Content "c:\temp\DesktopXP.txt" -ErrorAction SilentlyContinue
+$countNuncaxp = 0
+$countDesligaxp = 0 
 $values = @()
-$saidafinal = @()
+$saidafinalxp = @()
+
 foreach($line in $txtfile) 
 {
     $strtmp = $line -replace " ",""
     if($strtmp -like "Desligarmonitor(AC)Nunca*")
     {
-        $countNunca ++
+        $countNuncaxp ++
         $values += $line
     }
         if($strtmp -like "Desligarmonitor(AC)Depoisde*")
     {
-        $countDesliga ++
+        $countDesligaxp ++
         $values += $line
     }
 }
 
-#$countNunca
-#$countDesliga
+#$countNuncaxp
+#$countDesligaxp
 
 $computersTXT = @()
 foreach($line in $txtfile) 
@@ -119,10 +124,10 @@ foreach($line in $txtfile)
 
 for($i=0;$i -lt $computersTXT.Count; $i++)
 {
-     += $computersTXT[$i] +" : " + $values[$i]
+    $saidafinalxp += $computersTXT[$i] +" : " + $values[$i]
 
 }
-$saidafinal += "`nQtd de PC que nunca desligam o monitor: "+ $countNunca
-$saidafinal += "Qtd de PC que desligam o monitor: "+$countDesliga
+$saidafinalxp += "`nQtd de PC que nunca desligam o monitor: "+ $countNuncaxp
+$saidafinalxp += "Qtd de PC que desligam o monitor: "+$countDesligaxp
 
-$saidafinal | Out-File c:\temp\picadasgalaxias.txt
+$saidafinalxp | Out-File c:\temp\windowsxp.txt
