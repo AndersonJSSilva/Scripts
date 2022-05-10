@@ -1,10 +1,10 @@
-﻿$vCenterIP = "vmvc-rj2-01.vmware"
+﻿$vCenterIP = "vmvcenter.unimedrj.root"
 Add-PSSnapin VMware.VimAutomation.Core
 Connect-VIServer $vCenterIP
 
-$numclones = 20
-$vmtemplate = "unirjts"
-$newname = "wincabritex"
+$numclones = 6
+$vmtemplate = "win7_poc"
+$newname = "unipoc"
 
 for($i=1;$i-lt$numclones+1;$i++)
 {

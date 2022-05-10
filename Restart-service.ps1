@@ -38,5 +38,9 @@ write-host "Nome: " $service.caption "# Status: " $service.state -ForegroundColo
 }
 }
 
-#Restart-service -ComputerName spoappprd01 -Servicename ProcessExecutionService
-Restart-service -ComputerName nfseprd02 -Servicename NFSeService
+Restart-service -ComputerName excprd04 -Servicename rm.host
+Restart-service -ComputerName excprd04 -Servicename w3svc
+
+Restart-service -ComputerName spoappprd01 -Servicename ProcessExecutionService
+
+

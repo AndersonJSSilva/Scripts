@@ -28,15 +28,17 @@
         $ArrFolders
     }
 }
+
+
 try {
 	$schedule = new-object -com("Schedule.Service") 
-}catch{
+} catch {
 	Write-Warning "Schedule.Service COM Object not found, this script requires this object"
 	return
 }
 
-$computers = Get-Content c:\temp\onda6.txt
-foreach($ComputerName in $computers ){
+$hostnames = Get-Content c:\temp\servers.txt
+foreach($ComputerName in $hostnames ){
 
 try{$Schedule.connect($ComputerName)} catch {}
 $AllFolders = Get-AllTaskSubFolders
@@ -46,7 +48,7 @@ foreach ($Folder in $AllFolders) {
         $TASKS | % {[array]$results += $_}
         $Tasks | Foreach-Object {
         	        
-            if(([xml]$_.xml).Task.Principals.Principal.UserID -like "*administra*")
+            if(([xml]$_.xml).Task.Principals.Principal.UserID -like "*adm*")
             {
                 $ComputerName
                 write-host "`t" $_.path "`t`t" ([xml]$_.xml).Task.Principals.Principal.UserID

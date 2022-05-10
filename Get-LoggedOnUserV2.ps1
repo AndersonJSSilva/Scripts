@@ -46,7 +46,7 @@ End
 }
 
 
-$maquinas = Get-Content -Path C:\temp\Micros.txt
+$maquinas = Get-Content  
 $saida = @()
 foreach($maq in $maquinas)
 {

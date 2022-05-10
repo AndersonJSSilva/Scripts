@@ -25,8 +25,4 @@ Param($DNName,[int]$RecurseLimit=-1)
 ## $groups = Get-GroupMembership (Get-DistinguishedName adm41718)
 $usuario = Read-Host "Digite o usuario"
 Write-Host "`n"
-$users = Get-GroupMembership (Get-DistinguishedName $usuario) -RecurseLimit 0 
-
-#adiciona o usuário em cada grupo
-$users | %{Add-ADGroupMember -Identity $_ -Members e1034}
-
+Get-GroupMembership (Get-DistinguishedName $usuario) -RecurseLimit 0 

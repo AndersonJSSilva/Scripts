@@ -7,23 +7,14 @@ $pathbar1andar = "OU=1_andar,OU=_Barra,OU=Wsus - Windows Update,OU=Computadores,
 $pathbar2andar = "OU=2_andar,OU=_Barra,OU=Wsus - Windows Update,OU=Computadores,DC=unimedrj,DC=root"
 $pathbar3andar = "OU=3_andar,OU=_Barra,OU=Wsus - Windows Update,OU=Computadores,DC=unimedrj,DC=root"
 
-$pathpdo7andar = "OU=7_ANDAR,OU=_centro,OU=Wsus - Windows Update,OU=Computadores,DC=unimedrj,DC=root"
-$pathpdo8andar = "OU=8_ANDAR,OU=_centro,OU=Wsus - Windows Update,OU=Computadores,DC=unimedrj,DC=root"
-$pathpdo9andar = "OU=9_ANDAR,OU=_centro,OU=Wsus - Windows Update,OU=Computadores,DC=unimedrj,DC=root"
-$pathpdo10andar = "OU=10_ANDAR,OU=_centro,OU=Wsus - Windows Update,OU=Computadores,DC=unimedrj,DC=root"
-$pathpdo11andar = "OU=11_ANDAR,OU=_centro,OU=Wsus - Windows Update,OU=Computadores,DC=unimedrj,DC=root"
-
 $accounts = Get-ADComputer -filter {Name -like "*"} -Properties * | select name, ipv4address, canonicalname,lastlogondate,distinguishedname
 $accounts.Length
 $pcsmatch = @()
 $pcsnomatch = @()
-$pcsOUEspecial =@()
 foreach($account in $accounts)
 {
     if($account.ipv4address)
     {
-        if(($account.canonicalname -notlike "*bloqueio*") -and ($account.canonicalname -notlike "*netbios*"))
-        {
         $ipv4=($account.ipv4address).toString()
         if(($ipv4 -like "10.101.[10-13]*") -and ($account.canonicalname -notlike "*benfica*"))
         {
@@ -39,21 +30,10 @@ foreach($account in $accounts)
         {
             $pcsnomatch += $account
         }
-        if((($ipv4 -like "10.250.9.*") -or ($ipv4 -like "10.250.10.*") -or ($ipv4 -like "10.250.11.*") -or ($ipv4 -like "10.250.7.*") -or ($ipv4 -like "10.250.8.*") )-and ($account.canonicalname -notlike "*centro*"))
-        {
-            $pcsmatch  += $account
-        }else
-        {
-            $pcsnomatch += $account
-        }
-        }else{$pcsOUEspecial += $account}
     }    
 }
 $pcsmatch  | ft -AutoSize
 $pcsmatch.Length
-
-$pcsOUEspecial | ft -AutoSize
-$pcsOUEspecial.Length
 #$pcsnomatch| ft -AutoSize
 #$pcsnomatch.Length
 
@@ -95,30 +75,9 @@ foreach($pc in $pcsmatch)
         {
             Move-ADObject -Identity $pc.distinguishedname -TargetPath $pathbar3andar
         }
-        if($ipv4 -like "10.250.7*")
-        {
-            Move-ADObject -Identity $pc.distinguishedname -TargetPath $pathpdo7andar
-        }
-        if($ipv4 -like "10.250.8*")
-        {
-            Move-ADObject -Identity $pc.distinguishedname -TargetPath $pathpdo8andar
-        }
-        if($ipv4 -like "10.250.9*")
-        {
-            Move-ADObject -Identity $pc.distinguishedname -TargetPath $pathpdo9andar
-        }
-        if($ipv4 -like "10.250.10*")
-        {
-            Move-ADObject -Identity $pc.distinguishedname -TargetPath $pathpdo10andar
-        }
-        if($ipv4 -like "10.250.11*")
-        {
-            Move-ADObject -Identity $pc.distinguishedname -TargetPath $pathpdo11andar
-        }
-
     }
 }
 
 
 #verifica movidos
-$pcsmatch | %{Get-ADComputer -Identity $_.name -Properties * | select ipv4address,distinguishedname}
+$pcsmatch | %{Get-ADComputer -Identity $_.name -Properties * | select distinguishedname}

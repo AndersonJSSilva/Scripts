@@ -1,6 +1,5 @@
 ﻿#Importar biblioteca Oracle
-$LoadOracle = [Reflection.Assembly]::LoadFile("C:\app\Administrador\product\11.2.0\client_1\\ODP.NET\bin\2.x\Oracle.DataAccess.dll")
-
+$LoadOracle = [Reflection.Assembly]::LoadFile("C:\app\m41718\product\11.2.0\client_1\ODP.NET\bin\2.x\Oracle.DataAccess.dll")
 
 # Informação do BD
 $DBUsername = "supwin"

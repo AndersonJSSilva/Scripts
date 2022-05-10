@@ -1,10 +1,10 @@
-﻿$vms = Get-vmHost -Name esxiprd19.unimedrj.root | get-vm
+﻿$vms = Get-vmHost -Name esxiprd12.unimedrj.root | get-vm
 foreach($vm in $vms)
 {
     gwmi win32_logicaldisk -computer $vm -filter "drivetype=3" | ft PSComputerName,deviceid, @{Label="Size";Expression={"{0:N2}" -f ((($_.size/1024)/1024)/1024)+" GB" }}, @{Label="Free Space";Expression={"{0:N2}" -f ((($_.freespace/1024)/1024)/1024)+" GB" }}, @{Label="Used";Expression={"{0:N2}" -f (((($_.size - $_.freespace)/1024)/1024)/1024)+" GB" }}
 }
 
-gwmi win32_logicaldisk -computer gedceprd01 -filter "drivetype=3" | ft PSComputerName,deviceid, @{Label="Size";Expression={"{0:N2}" -f ((($_.size/1024)/1024)/1024)+" GB" }}, @{Label="Free Space";Expression={"{0:N2}" -f ((($_.freespace/1024)/1024)/1024)+" GB" }}, @{Label="Used";Expression={"{0:N2}" -f (((($_.size - $_.freespace)/1024)/1024)/1024)+" GB" }}
+gwmi win32_logicaldisk -computer polnwstiss01 -filter "drivetype=3" | ft PSComputerName,deviceid, @{Label="Size";Expression={"{0:N2}" -f ((($_.size/1024)/1024)/1024)+" GB" }}, @{Label="Free Space";Expression={"{0:N2}" -f ((($_.freespace/1024)/1024)/1024)+" GB" }}, @{Label="Used";Expression={"{0:N2}" -f (((($_.size - $_.freespace)/1024)/1024)/1024)+" GB" }}
 
 
 
