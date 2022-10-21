@@ -13,13 +13,14 @@ rpm -i zabbix-agent-5.4.7-1.el8.x86_64.rpm
 yum install -y zabbix-agent
 
 #Configuração do Config do Zabbix
-mv /etc/zabbix/zabbix_agentd.conf /etc/zabbix/zabbix_agentd.conf.original
+dt=`date '+%d_%m_%Y_%H_%M_%S'_"$USER"`
+mv /etc/zabbix/zabbix_agentd.conf /etc/zabbix/zabbix_agentd-$dt.conf
 echo "
 PidFile=/var/run/zabbix/zabbix_agentd.pid
+#Hostname=$hostname
 LogFile=/var/log/zabbix/zabbix_agentd.log
 LogFileSize=20
 Include=/etc/zabbix/zabbix_agentd.d/
-#Hostname=$hostname
 EnableRemoteCommands=1
 LogRemoteCommands=1
 Server=$server
@@ -40,7 +41,11 @@ iface=$( ip -o route get $ip | perl -nle 'if ( /dev\s+(\S+)/ ) {print $1}' )
 echo "$server/32 via $gateway" >> /etc/sysconfig/network-scripts/route-$iface
 ifdown $iface && ifup $iface
 
-#Habilitação e Iniialização do Zabbix
+#Desabilitar Firewall
+systemctl stop firewalld
+systemctl disable firewalld
+
+#Habilitação e Inicialização do Zabbix
 systemctl start zabbix-agent
 systemctl enable zabbix-agent
 
